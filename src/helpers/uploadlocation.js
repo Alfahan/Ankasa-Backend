@@ -2,14 +2,14 @@ const multer = require('multer')
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'src/uploads')
+        cb(null, 'src/uploads/locations')
     },
-    filename: (req, ile, cb) => {
+    filename: (req, file, cb) => {
         cb(null, `${file.fieldname}+${Date.now()}.jpg`)
     }
 })
 
-const upload = multer ({
+const uploadlocation = multer ({
     storage,
     limits: { fileSize: 5000000 },
     fileFilter(req, file, callback) {
@@ -21,4 +21,4 @@ const upload = multer ({
     }
 })
 
-module.exports = upload
+module.exports = uploadlocation
