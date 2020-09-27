@@ -54,7 +54,7 @@ const users = {
                             if (err) {
                                 console.log(err)
                             } else {
-                                tokenStatus(res, {token: token}, "Login success!")
+                                tokenStatus(res, {token: token, iduser : userData.iduser}, "Login success!")
                             }
                         }
                     ) 
