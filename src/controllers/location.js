@@ -60,7 +60,7 @@ const fs = require('fs')
                         if(err.code === 'LIMIT_FILE_SIZE'){
                             failed(res, [], 'file size is too large')
                         }else{
-                            failed(res, [], err)
+                            failed(res, [], err.message)
                         }
                     }
                     const id = req.params.idlocation
