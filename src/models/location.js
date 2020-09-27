@@ -38,6 +38,17 @@ const { reject, result } = require('lodash')
                 })
             })
         },
+        update : (data, id) => {
+            return new Promise((resolve,reject) => {
+                db.query(`UPDATE location SET ? WHERE idlocation= ?`, [data,id], (err,result) => {
+                    if (err) {
+                        reject(new Error(err))
+                    }else (
+                        resolve(result)
+                    )
+                })
+            })
+        },
         delete : (id) => {
             return new Promise((resolve,reject) => {
                 db.query(`DELETE FROM location WHERE idlocation='${id}' `,

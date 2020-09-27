@@ -53,6 +53,48 @@ const fs = require('fs')
                 failed(res,[], 'Internal Server Error')
             }
         },
+        update: (req,res) => {
+            try {
+                upload.single('imglocation')(req,res, (err) => {
+                    if(err){
+                        if(err.code === 'LIMIT_FILE_SIZE'){
+                            failed(res, [], 'file size is too large')
+                        }else{
+                            failed(res, [], err)
+                        }
+                    }
+                    const id = req.params.idlocation
+                    const body = req.body
+                    locationModel.getdetail(id)
+                    .then((result) => {
+                        body.imglocation = req.file.filename
+                        const oldImage = result[0].imglocation
+                        let ImageName = null
+                        if (!body.imglocation){
+                            ImageName = oldImage
+                        } else {
+                            ImageName = body.imglocation
+                            fs.unlink(`src/uploads/locations/${oldImage}`, (err) => {
+                                if(err){
+                                    failed(res, [], err.message)
+                                }else{
+                                    locationModel.update(body,id)
+                                    .then((results) => {
+                                        success(res, results, `Data Location Updated`)
+                                    }).catch((err) => {
+                                        failed(res, [], err.message)
+                                    })
+                                }
+                            })
+                        }
+                    }).catch((err) => {
+                        failed(res, [], err.message)
+                    })
+                })
+            } catch (error) {
+                failed(res, [], `Internal Server Error`)
+            }
+        },
         delete: (req,res) =>{
             try {
                 const id= req.params.idlocation
