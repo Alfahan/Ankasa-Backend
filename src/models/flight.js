@@ -1,9 +1,14 @@
 const db = require('../configs/db')
 
 const flight = {
-    getAll: () => {
+    getAll: (sort, type, departuretimeFrom, departuretimeTo, timearrivedFrom, timearrivedTo, priceLow, priceHigh) => {
         return new Promise ((resolve, reject) => {
-            db.query(`SELECT * FROM flight`, (err, result) => {
+            db.query(`SELECT * FROM flight INNER JOIN airlines ON flight.idairlines = airlines.idairlines 
+            WHERE 
+            departuretime BETWEEN '${departuretimeFrom}' AND '${departuretimeTo}' AND
+            timearrived BETWEEN '${timearrivedFrom}' AND '${timearrivedTo}' AND 
+            price BETWEEN ${priceLow} AND ${priceHigh}
+            ORDER BY ${sort} ${type}`, (err, result) => {
                 if (err) {
                     reject(new Error(err))
                 } else {
