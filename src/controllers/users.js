@@ -7,6 +7,8 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const mailer = require('nodemailer')
 const response = require('../helpers/response')
+const { fail } = require('assert')
+const { result } = require('lodash')
 
 const users = {
     register: async (req, res) => {
@@ -47,7 +49,7 @@ const users = {
                 })
 
                 let mailOptions = {
-                    from    : emaill,
+                    from    : `ANKASA ${emaill}`,
                     to      : data.email,
                     subject : `HELLO ${data.email}`,
                     html:
@@ -206,6 +208,89 @@ const users = {
             })
         } catch (error) {
             failed(res, [], `Internal Server Error`)
+        }
+    },
+    ForgotPassword: (req,res) => {
+        try {
+            const body = req.body
+            const email = body.email
+            usersModel.getEmailUsers(body.email)
+
+            .then(() => {
+                const userKey = jwt.sign({
+                    email: body.email,
+                    username: body.username
+                }, JWT_KEY)
+
+                usersModel.updateUserKey(userKey,email)
+                .then(async() => {
+                    let transporter = mailer.createTransport({
+                        host: 'smtp.gmail.com',
+                        port: 587,
+                        secure: false,
+                        requireTLS: true,
+                        auth:{
+                            user: emaill,
+                            pass: passwordd
+                        }
+                    })
+    
+                    let mailOptions = {
+                        from    : emaill,
+                        to      : body.email,
+                        subject : `Reset Password ${body.email}`,
+                        html:
+                        `Hai
+                        
+                        KLIK --> <a href="${url}users/verify/${userKey}">Klik this link for Reset Password</a>  <---`
+                    }
+    
+                    transporter.sendMail(mailOptions,(err, result) => {
+                        if(err) {
+                            res.status(505)
+                            failed(res, [], err.message)
+                        } else {
+                            success(res, [result], `Send Mail Success`)
+                        }
+                    })
+                    res.json({
+                        message: `Please Check Email For Reset Password`
+                    })
+                }).catch((err) =>{
+                    failed(res, [], err)
+                })
+            }).catch((err) =>{
+                failed(res, [], err)
+            })
+        } catch (error) {
+            failed(res, [], `Internal Server Error`)
+        }
+    },
+    newPassword: async (req, res) => {
+        try {
+            const body = req.params.body
+
+            console.log(body.password)
+            // console.log(body.confirm)
+
+            
+            if( body.password === body.confirm ){
+                // const salt = await bcrypt.genSalt(10)
+                // // const hashWord = await bcrypt.hash(body.password, salt)
+                
+                // const userkey = body.userKey
+                // usersModel.newPassword(hashWord ,userkey)
+                // .then((result) => {
+                //     success(res, result, `Update Password Success`)
+                // }).catch((err) => {
+                //     failed(res, [], err)
+                // })
+            }else{
+
+            }
+
+        } catch (error) {
+            // failed(res, [], `Internal Server Error`)
         }
     },
     getAll: (req, res) => {

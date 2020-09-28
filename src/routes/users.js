@@ -5,15 +5,29 @@ const { authenticate, authorize } = require('../helpers/auth')
 const router = express.Router();
 
 router
+    // Register
     .post('/register',  usersController.register)
+    // Login
     .post('/login', usersController.login)
-    .get('/getall', authenticate, authorize, usersController.getAll)
-    .get('/getDetail/:iduser', authenticate, authorize, usersController.getDetail)
+    // Insert
     .post('/insert', authenticate, authorize, usersController.insert)
-    .patch('/update/:iduser', authenticate, authorize, usersController.update)
-    .delete('/delete/:iduser', authenticate, authorize, usersController.delete)
-    .get('/verify/:token', usersController.verify)
+    // Refresh Token
     .post('/refreshToken', authenticate, authorize, usersController.renewToken)
+    // Logout
     .post('/logout/:iduser',authenticate, authorize, usersController.logout)
-
+    // Forgot Password
+    .post('/ForgotPassword', usersController.ForgotPassword)
+    // Send New Password
+    .post('/newPassword', usersController.newPassword)
+    // Verify Token
+    .get('/verify/:token', usersController.verify)
+    // Get All
+    .get('/getall', authenticate, authorize, usersController.getAll)
+    // Get All Detail
+    .get('/getDetail/:iduser', authenticate, authorize, usersController.getDetail)
+    // Update 
+    .patch('/update/:iduser', authenticate, authorize, usersController.update)
+    // Delete
+    .delete('/delete/:iduser', authenticate, authorize, usersController.delete)
+    
 module.exports = router;

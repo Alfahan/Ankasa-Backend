@@ -48,6 +48,18 @@ const users = {
             })
         })
     },
+    updateUserKey:(userKey,email) => {
+        return new Promise((resolve,reject) => {
+            db.query(`UPDATE users SET userKey='${userKey}' WHERE email='${email}'`,
+            (err,result) => {
+                if(err) {
+                    reject(new Error(err))
+                }else{
+                    resolve(result)
+                }
+            })
+        })
+    },
     checkRefreshToken: (refreshToken) => {
         return new Promise((resolve,reject)=>{
             db.query(`SELECT *FROM users WHERE refreshToken='${refreshToken}'`, 
@@ -122,6 +134,21 @@ const users = {
                     reject(new Error(err))
                 }else{
                     resolve(result)
+                }
+            })
+        })
+    },
+    getEmailUsers: (email) => {
+        return new Promise((resolve, reject) => {
+            db.query(`SELECT *FROM users WHERE email='${email}'`, (err, result) => {
+                if(err){
+                    reject(new Error(err))
+                }else{
+                    if(result.length > 0){
+                        resolve(result)
+                    }else{
+                        reject(`Email tidak ditemukan`)
+                    }
                 }
             })
         })
