@@ -195,6 +195,19 @@ const users = {
             failed(res, [], err.message)
         })
     },
+    logout: (req,res) => {
+        try {
+            const destroy = req.params.iduser
+            usersModel.logout(destroy)
+            .then((result) => {
+                success(res,result, `Logout Success`)
+            }).catch((err) => {
+                failed(res,[], err.message)
+            })
+        } catch (error) {
+            failed(res, [], `Internal Server Error`)
+        }
+    },
     getAll: (req, res) => {
         try {
             const body = req.params.body
