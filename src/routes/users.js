@@ -13,5 +13,6 @@ router
     .patch('/update/:iduser', authenticate, authorize, usersController.update)
     .delete('/delete/:iduser', authenticate, authorize, usersController.delete)
     .get('/verify/:token', usersController.verify)
+    .post('/refreshToken', authenticate, authorize, usersController.renewToken)
 
 module.exports = router;

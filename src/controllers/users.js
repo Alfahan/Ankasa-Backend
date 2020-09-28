@@ -133,7 +133,7 @@ const users = {
                                     if(userRefreshToken === null){
                                         const id = userData.iduser
                                         const refreshToken = jwt.sign( 
-                                            {id} , JWT_REFRESH)
+                                            {id} , JWT_KEY)
                                         usersModel.updateRefreshToken(refreshToken,id)
                                         .then(() => {
                                             const data = {
@@ -147,9 +147,8 @@ const users = {
                                         })
                                     }else{
                                         const data = {
-                                            id: id,
                                             token: token,
-                                            refreshToken: refreshToken
+                                            refreshToken: userRefreshToken
                                         }
                                         tokenStatus(res, data, 'Login Success')
                                     }
@@ -169,6 +168,32 @@ const users = {
         } catch (error) {
             failed(res, [], 'Internal server error!')
         }
+    },
+    renewToken: (req, res) =>{
+        const refreshToken = req.body.refreshToken
+        usersModel.checkRefreshToken(refreshToken)
+        .then((result)=>{
+            if(result.length >=1){
+                const user = result[0];
+                const newToken = jwt.sign(
+                    {
+                        email: user.email,
+                        level: user.level
+                    },
+                    JWT_REFRESH,
+                    {expiresIn: 3600}
+                )
+                const data = {
+                    token: newToken,
+                    refreshToken: refreshToken
+                }
+                tokenStatus(res,data, `The token has been refreshed successfully`)
+            }else{
+                failed(res,[], `Refresh token not found`)
+            }
+        }).catch((err) => {
+            failed(res, [], err.message)
+        })
     },
     getAll: (req, res) => {
         try {

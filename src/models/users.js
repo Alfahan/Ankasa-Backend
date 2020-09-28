@@ -36,6 +36,18 @@ const users = {
             })
         })
     },
+    checkRefreshToken: (refreshToken) => {
+        return new Promise((resolve,reject)=>{
+            db.query(`SELECT *FROM users WHERE refreshToken='${refreshToken}'`, 
+            (err,result) =>{
+                if(err){
+                    reject(new Error(err))
+                }else{
+                    resolve(result)
+                }
+            })
+        })  
+    },
     getAll: () => {
         return new Promise((resolve, reject) => {
             db.query(`SELECT * FROM USERS`, (err, result) => {
