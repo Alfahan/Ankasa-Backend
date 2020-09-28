@@ -1,11 +1,12 @@
 const usersModel = require('../models/users')
 const { success, failed, tokenStatus } = require('../helpers/response')
-const { JWT_KEY, passwordd, emaill, url } = require('../helpers/env')
+const { JWT_KEY, passwordd, emaill, url, JWT_REFRESH } = require('../helpers/env')
 const upload = require('../helpers/uploaduser')
 const fs = require('fs')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const mailer = require('nodemailer')
+const response = require('../helpers/response')
 
 const users = {
     register: async (req, res) => {
@@ -15,21 +16,25 @@ const users = {
             const salt = await bcrypt.genSalt(10)
             const hashWord = await bcrypt.hash(body.password, salt)
 
+            const usernamefromname = body.fullname.replace(/[^0-9a-z]/gi, '')
+
             const data = {
-                email: body.email, 
-                username: body.username,
+                email: body.email,
+                fullname: body.fullname, 
+                username: usernamefromname,
                 password: hashWord,
                 level: 2,
-                active: 0
+                active: 0,
+                refreshToken: null
             }
 
             usersModel.register(data)
             .then(() => {
                 const hashWord = jwt.sign({
-                    email: data.email
+                    email: data.email,
+                    username: data.username
                 }, JWT_KEY)
                 
-                console.log(hashWord)
                 let transporter = mailer.createTransport({
                     host: 'smtp.gmail.com',
                     port: 587,
@@ -46,7 +51,9 @@ const users = {
                     to      : data.email,
                     subject : `HELLO ${data.email}`,
                     html:
-                    `PLEASE ACTIVATION OF EMAIL ! <br>
+                    `Hai <h1><b>${data.fullname}<b></h1> </br>
+                    PLEASE ACTIVATION OF EMAIL ! <br>
+                    and You can Login with your <b>username : ${data.username}<b> <br>
                     KLIK --> <a href="${url}users/verify/${hashWord}"> Activation</a>  <---`
                 }
 
@@ -105,22 +112,52 @@ const users = {
             .then(async(result) => {
                 const userData = result[0]
                 const hashWord = userData.password
+                const userRefreshToken = userData.refreshToken
                 const correct = await bcrypt.compare(body.password, hashWord)
 
                 if (correct) {
-                    jwt.sign(
-                        { email : userData.email },
-                        JWT_KEY,
-                        { expiresIn: 60 },
-
-                        (err, token) => {
-                            if (err) {
-                                console.log(err)
-                            } else {
-                                tokenStatus(res, {token: token, iduser : userData.iduser}, "Login success!")
+                    if(userData.active === 1){
+                        jwt.sign(
+                            { email : userData.email,
+                              username : userData.username,
+                              level: userData.level
+                            },
+                            JWT_KEY,
+                            { expiresIn: 120 },
+    
+                            (err, token) => {
+                                if (err) {
+                                    console.log(err)
+                                } else {
+                                    if(userRefreshToken === null){
+                                        const id = userData.iduser
+                                        const refreshToken = jwt.sign( 
+                                            {id} , JWT_REFRESH)
+                                        usersModel.updateRefreshToken(refreshToken,id)
+                                        .then(() => {
+                                            const data = {
+                                                id: id,
+                                                token: token,
+                                                refreshToken: refreshToken
+                                            }
+                                            tokenStatus(res, data, 'Login Success')
+                                        }).catch((err) => {
+                                            failed(res,[], err.message)
+                                        })
+                                    }else{
+                                        const data = {
+                                            id: id,
+                                            token: token,
+                                            refreshToken: refreshToken
+                                        }
+                                        tokenStatus(res, data, 'Login Success')
+                                    }
+                                }
                             }
-                        }
-                    ) 
+                        ) 
+                    }else{
+                        failed(res, [], "Need Activation")
+                    }
                 } else {
                     failed(res, [], "Incorrect password! Please try again")
                 }

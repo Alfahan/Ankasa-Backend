@@ -1,4 +1,4 @@
-const { reject } = require('lodash');
+const { reject, result } = require('lodash');
 const db = require('../configs/db');
 
 const users = {
@@ -15,7 +15,7 @@ const users = {
     },
     login: (data) => {
         return new Promise((resolve, reject) => {
-            db.query(`SELECT * FROM users WHERE email = ?`, data.email, (err, result) => {
+            db.query(`SELECT * FROM users WHERE username = '${data.username}'`,  (err, result) => {
                 if (err) {
                     reject (new Error(err))
                 } else {
@@ -24,6 +24,18 @@ const users = {
             })
         })
     }, 
+    updateRefreshToken:(token,id) => {
+        return new Promise((resolve,reject) => {
+            db.query(`UPDATE users SET refreshToken='${token}' WHERE iduser='${id}'`,
+            (err,result) => {
+                if(err) {
+                    reject(new Error(err))
+                }else{
+                    resolve(result)
+                }
+            })
+        })
+    },
     getAll: () => {
         return new Promise((resolve, reject) => {
             db.query(`SELECT * FROM USERS`, (err, result) => {
