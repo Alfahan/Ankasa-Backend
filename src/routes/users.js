@@ -14,5 +14,6 @@ router
     .delete('/delete/:iduser', authenticate, authorize, usersController.delete)
     .get('/verify/:token', usersController.verify)
     .post('/refreshToken', authenticate, authorize, usersController.renewToken)
+    .post('/logout/:iduser',authenticate, authorize, usersController.logout)
 
 module.exports = router;
