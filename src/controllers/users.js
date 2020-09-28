@@ -90,7 +90,8 @@ const users = {
                     .then((result) => {
                         if(result.affectedRows){
                             res.status(200)
-                            success(res, {email}, `Congrats Gaes`)
+                            // success(res, {email}, `Congrats Gaes`)
+                            res.render('index', {email})
                         }else{
                             res.status(505)
                             failed(res, [], err.message)
