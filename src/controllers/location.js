@@ -1,7 +1,7 @@
 const locationModel = require('../models/location')
 const { success, failed } = require('../helpers/response')
 
-const upload = require('../helpers/uploadlocation')
+const upload = require('../helpers/upload')
 const fs = require('fs')
 
     const location = {
@@ -74,7 +74,8 @@ const fs = require('fs')
                             ImageName = oldImage
                         } else {
                             ImageName = body.imglocation
-                            fs.unlink(`src/uploads/locations/${oldImage}`, (err) => {
+
+                            fs.unlink(`src/uploads/${oldImage}`, (err) => {
                                 if(err){
                                     failed(res, [], err.message)
                                 }else{
@@ -101,7 +102,7 @@ const fs = require('fs')
                 locationModel.getdetail(id)
                 .then((result) => {
                     const Image = result[0].imglocation
-                    fs.unlink(`src/uploads/locations/${Image}`, (err) => {
+                    fs.unlink(`src/uploads/${Image}`, (err) => {
                         if(err) {
                             failed(res, [], err.message)
                         } else {

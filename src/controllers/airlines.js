@@ -1,7 +1,7 @@
 const airlinesModel = require('../models/airlines')
 const { success, failed } = require('../helpers/response')
 
-const upload = require('../helpers/uploadairlines')
+const upload = require('../helpers/upload')
 
 const fs = require('fs')
 
@@ -75,7 +75,7 @@ const fs = require('fs')
                             ImageName = oldImage
                         } else {
                             ImageName = body.imgairlines
-                            fs.unlink(`src/uploads/airlines/${oldImage}`,(err) => {
+                            fs.unlink(`src/uploads/${oldImage}`,(err) => {
                                 if(err){
                                     failed(res,[], err.message)
                                 }else{
@@ -100,7 +100,7 @@ const fs = require('fs')
                 airlinesModel.getdetail(id)
                 .then((result) => {
                     const Image = result[0].imgairlines
-                    fs.unlink(`src/uploads/airlines/${Image}`, (err) => {
+                    fs.unlink(`src/uploads/${Image}`, (err) => {
                         if(err){
                             failed(res, [], err.message)
                         }else{

@@ -1,7 +1,7 @@
 const usersModel = require('../models/users')
 const { success, failed, tokenStatus } = require('../helpers/response')
 const { JWT_KEY, passwordd, emaill, url, JWT_REFRESH } = require('../helpers/env')
-const upload = require('../helpers/uploaduser')
+const upload = require('../helpers/upload')
 const fs = require('fs')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
