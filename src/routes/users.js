@@ -12,4 +12,6 @@ router
     .post('/insert', authenticate, authorize, usersController.insert)
     .patch('/update/:iduser', authenticate, authorize, usersController.update)
     .delete('/delete/:iduser', authenticate, authorize, usersController.delete)
+    .get('/verify/:token', usersController.verify)
+
 module.exports = router;

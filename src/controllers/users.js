@@ -1,12 +1,11 @@
 const usersModel = require('../models/users')
 const { success, failed, tokenStatus } = require('../helpers/response')
-
-const bcrypt = require('bcrypt')
-const jwt = require('jsonwebtoken')
-const { JWT_KEY } = require('../helpers/env')
-
+const { JWT_KEY, passwordd, emaill, url } = require('../helpers/env')
 const upload = require('../helpers/uploaduser')
 const fs = require('fs')
+const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
+const mailer = require('nodemailer')
 
 const users = {
     register: async (req, res) => {
@@ -20,18 +19,82 @@ const users = {
                 email: body.email, 
                 username: body.username,
                 password: hashWord,
-                level: body.level
+                level: 2,
+                active: 0
             }
 
             usersModel.register(data)
-            .then((result) => {
-                success(res, result, `${data.username} you are registered! Please check your email to activate the account`)
+            .then(() => {
+                const hashWord = jwt.sign({
+                    email: data.email
+                }, JWT_KEY)
+                
+                console.log(hashWord)
+                let transporter = mailer.createTransport({
+                    host: 'smtp.gmail.com',
+                    port: 587,
+                    secure: false,
+                    requireTLS: true,
+                    auth:{
+                        user: emaill,
+                        pass: passwordd
+                    }
+                })
+
+                let mailOptions = {
+                    from    : emaill,
+                    to      : data.email,
+                    subject : `HELLO ${data.email}`,
+                    html:
+                    `PLEASE ACTIVATION OF EMAIL ! <br>
+                    KLIK --> <a href="${url}users/verify/${hashWord}"> Activation</a>  <---`
+                }
+
+                transporter.sendMail(mailOptions,(err, result) => {
+                    if(err) {
+                        res.status(505)
+                        failed(res, [], err.message)
+                    } else {
+                        success(res, [result], `Send Mail Success`)
+                    }
+                })
+
+                res.json({
+                    message: `Success Registration, Please Activation of Email`
+                })
             })
             .catch((err) => {
                 failed(res, [], err.message)
             })
         } catch (error) {
             failed(res, [], 'Internal server error!')            
+        }
+    },
+    verify: (req,res) => {
+        const token = req.params.token
+        if(token) {
+            jwt.verify(token, JWT_KEY, (err,decode) => {
+                if(err){
+                    res.status(505)
+                    failed(res, [], `Failed Activation`)
+                }else{
+                    const email = decode.email
+                    usersModel.getUsers(email)
+                    .then((result) => {
+                        if(result.affectedRows){
+                            res.status(200)
+                            success(res, {email}, `Congrats Gaes`)
+                        }else{
+                            res.status(505)
+                            failed(res, [], err.message)
+                        }
+                    })
+                    .catch((err)=>{
+                        res.status(505)
+                        response.failed(res, [], err.message)
+                    })
+                }
+            })
         }
     },
     login: async (req, res) => {
