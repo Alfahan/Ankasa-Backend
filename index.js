@@ -12,9 +12,7 @@ const { PORT } = require('./src/helpers/env')
 
 
 const app = express();
-
 app.set('views', path.join(__dirname,'src/views'))
-
 app.set('view engine', 'ejs')
 
 app.use(bodyParser.urlencoded({ extended: false}))
