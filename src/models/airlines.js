@@ -1,5 +1,4 @@
 const db = require('../configs/db')
-const { reject, result } = require('lodash')
 
     const airlines = {
         getall: (name, sort, type) => {
