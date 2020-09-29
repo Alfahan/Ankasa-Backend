@@ -8,7 +8,10 @@ const fs = require('fs')
     const airlines = {
         getall: (req, res) => {
             try {
-                airlinesModel.getall()
+                const name = !req.query.name ? '' : req.query.name
+                const sort = !req.query.sort ? 'nameairlines' : req.query.sort
+                const type = !req.query.type ? 'ASC' : req.query.type
+                airlinesModel.getall(name, sort, type)
                 .then((result) => {
                     success(res, result, 'Get All Airlines Success')
                 }).catch((err) => {
@@ -36,7 +39,7 @@ const fs = require('fs')
                 upload.single('imgairlines')(req,res, (err) => {
                     if(err){
                         if(err.code === 'LIMIT_FILE_SIZE'){
-                            failed(res, [], 'file size is too large')
+                            failed(res, [], 'Image size is too big! Please upload another one with size <5mb')
                         }else{
                             failed(res, [], err)
                         }
@@ -59,7 +62,7 @@ const fs = require('fs')
                 upload.single('imgairlines')(req,res, (err) => {
                     if(err){
                         if(err.code === 'LIMIT_FILE_SIZE'){
-                            failed(res, [], 'file size is too large')
+                            failed(res, [], 'Image size is too big! Please upload another one with size <5mb')
                         }else{
                             failed(res, [], err)
                         }

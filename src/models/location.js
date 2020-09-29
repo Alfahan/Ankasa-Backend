@@ -1,9 +1,9 @@
 const db = require('../configs/db')
 
     const location = {
-        getall: () => {
+        getall: (country, sort, type) => {
             return new Promise((resolve, reject) => {
-                db.query(`SELECT *FROM location`,
+                db.query(`SELECT *FROM location WHERE country LIKE '%${country}%' ORDER BY ${sort} ${type}`,
                 (err,result)=>{
                     if(err){
                         reject(new Error(err))

@@ -53,7 +53,7 @@ const users = {
                     subject : `HELLO ${data.email}`,
                     html:
                     `Hai <h1><b>${data.fullname}<b></h1> </br>
-                    PLEASE ACTIVATION OF EMAIL ! <br>
+                    PLEASE ACTIVATE YOUR EMAIL ! <br>
                     and You can Login with your <b>username : ${data.username}<b> <br>
                     KLIK --> <a href="${url}users/verify/${hashWord}"> Activation</a>  <---`
                 }

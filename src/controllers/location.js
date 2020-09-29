@@ -7,7 +7,10 @@ const fs = require('fs')
     const location = {
         getall: (req,res) => {
             try {
-                locationModel.getall()
+                const country = !req.query.country ? '' : req.query.country
+                const sort = !req.query.sort ? 'country' : req.query.sort
+                const type = !req.query.type ? 'ASC' : req.query.type
+                locationModel.getall(country, sort, type)
                 .then((result) => {
                     success(res, result, 'Get All Location Success')
                 }).catch((err) => {
@@ -35,7 +38,7 @@ const fs = require('fs')
                 upload.single('imglocation')(req,res, (err) => {
                     if(err){
                         if(err.code === 'LIMIT_FILE_SIZE'){
-                            failed(res, [], 'file size is too large')
+                            failed(res, [], 'Image size is too big! Please upload another one with size <5mb')
                         }else{
                             failed(res, [], err)
                         }
@@ -58,7 +61,7 @@ const fs = require('fs')
                 upload.single('imglocation')(req,res, (err) => {
                     if(err){
                         if(err.code === 'LIMIT_FILE_SIZE'){
-                            failed(res, [], 'file size is too large')
+                            failed(res, [], 'Image size is too big! Please upload another one with size <5mb')
                         }else{
                             failed(res, [], err.message)
                         }
@@ -118,7 +121,7 @@ const fs = require('fs')
                     console.log(err)
                 })
             } catch (error) {
-                failed(rea, [], `Internal Server Error`)
+                failed(res, [], `Internal Server Error`)
             }
         }
 

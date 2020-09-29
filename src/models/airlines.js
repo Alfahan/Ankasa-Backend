@@ -2,9 +2,9 @@ const db = require('../configs/db')
 const { reject, result } = require('lodash')
 
     const airlines = {
-        getall: () => {
+        getall: (name, sort, type) => {
             return new Promise((resolve,reject) => {
-                db.query(`SELECT *FROM airlines`, 
+                db.query(`SELECT *FROM airlines WHERE nameairlines LIKE '%${name}%' ORDER BY ${sort} ${type}`, 
                 (err, result) =>{
                     if(err){
                         reject(new Error(err))
