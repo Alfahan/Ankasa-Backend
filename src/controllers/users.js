@@ -139,7 +139,7 @@ const users = {
                                         usersModel.updateRefreshToken(refreshToken,id)
                                         .then(() => {
                                             const data = {
-                                                id: id,
+                                                username: userData.username,
                                                 token: token,
                                                 refreshToken: refreshToken
                                             }
@@ -149,6 +149,7 @@ const users = {
                                         })
                                     }else{
                                         const data = {
+                                            username: userData.username,
                                             token: token,
                                             refreshToken: userRefreshToken
                                         }
@@ -277,6 +278,7 @@ const users = {
             const key = req.params.userkey
 
             usersModel.newPassword(hashWord ,key)
+
             .then((result) => {
                 success(res, result, `Update Password Success`)
                 jwt.verify(key, JWT_KEY, (err,decode) =>{
@@ -285,6 +287,7 @@ const users = {
                         failed(res, [], `Failed Reset userkey`)
                     }else{
                         const email = decode.email
+                        console.log(email)
                         usersModel.resetKey(email)
                         .then((results) => {
                             if(results.affectedRows){
