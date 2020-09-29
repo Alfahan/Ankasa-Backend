@@ -7,8 +7,6 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const mailer = require('nodemailer')
 const response = require('../helpers/response')
-const { fail } = require('assert')
-const { result } = require('lodash')
 
 const users = {
     register: async (req, res) => {
@@ -121,7 +119,8 @@ const users = {
                 if (correct) {
                     if(userData.active === 1){
                         jwt.sign(
-                            { email : userData.email,
+                            { 
+                              email : userData.email,
                               username : userData.username,
                               level: userData.level
                             },
@@ -180,9 +179,10 @@ const users = {
                 const newToken = jwt.sign(
                     {
                         email: user.email,
+                        username: user.username,
                         level: user.level
                     },
-                    JWT_REFRESH,
+                    JWT_KEY,
                     {expiresIn: 3600}
                 )
                 const data = {
@@ -367,13 +367,13 @@ const users = {
                             oldName = oldImg
                         } else {
                             oldName = body.image
-                            fs.unlink(`src/uploads/users/${oldImg}`, (err) => {
+                            fs.unlink(`src/uploads/${oldImg}`, (err) => {
                                 if(err){
                                     failed(res, [], err.message)
                                 } else {
                                     usersModel.update(body, iduser)
                                     .then((result) => {
-                                        success(res, result, `User with id = ${iduser} is updated!`)
+                                        success(res, result, `User with id  ${iduser} is updated!`)
                                     })
                                     .catch((err) => {
                                         failed(res, [], err.message)
@@ -394,7 +394,7 @@ const users = {
             usersModel.getDetail(iduser)
             .then((result) => {
                 const image = result[0].image
-                fs.unlink(`src/uploads/users/${image}`, (err) => {
+                fs.unlink(`src/uploads/${image}`, (err) => {
                     if(err) {
                         failed(res, [], err.message)
                     } else {
