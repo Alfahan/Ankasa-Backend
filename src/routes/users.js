@@ -18,7 +18,7 @@ router
     // Forgot Password
     .post('/ForgotPassword', usersController.ForgotPassword)
     // Send New Password
-    .post('/newPassword', usersController.newPassword)
+    .post('/newPassword/:userkey', usersController.newPassword)
     // Verify Token
     .get('/verify/:token', usersController.verify)
     // Get All

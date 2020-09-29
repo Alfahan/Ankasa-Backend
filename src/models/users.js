@@ -60,9 +60,9 @@ const users = {
             })
         })
     },
-    resetKey:(key) => {
+    resetKey:(email) => {
         return new Promise((resolve,reject) => {
-            db.query(`UPDATE users SET userkey= null WHERE userkey='${key}'`,
+            db.query(`UPDATE users SET userkey= null WHERE userkey='${email}'`,
             (err,result) => {
                 if(err) {
                     reject(new Error(err))

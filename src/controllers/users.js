@@ -243,7 +243,7 @@ const users = {
                         html:
                         `Hai
                         This is an email to reset the password
-                        KLIK --> <a href="${urlforgot}?userkey=${userKey}">Klik this link for Reset Password</a>  <---`
+                        KLIK --> <a href="${urlforgot}/forgot?userkey=${userKey}">Klik this link for Reset Password</a>  <---`
                     }
     
                     transporter.sendMail(mailOptions,(err, result) => {
@@ -274,16 +274,30 @@ const users = {
             const salt = await bcrypt.genSalt(10)
             const hashWord = await bcrypt.hash(body.password, salt)
 
-            const key = body.userkey
+            const key = req.params.userkey
 
             usersModel.newPassword(hashWord ,key)
             .then((result) => {
                 success(res, result, `Update Password Success`)
-                usersModel.resetKey(key)
-                .then((results) => {
-                    success(res, results, `Update Password Success`)
-                }).catch((err) => {
-                    failed(res, [], err.message)
+                jwt.verify(key, JWT_KEY, (err,decode) =>{
+                    if(err){
+                        res.status(505)
+                        failed(res, [], `Failed Reset userkey`)
+                    }else{
+                        const email = decode.email
+                        usersModel.resetKey(email)
+                        .then((results) => {
+                            if(results.affectedRows){
+                                res.status(200)
+                                success(res, results, `Update Password Success`)
+                            }else{
+                                res.status(505)
+                                // failed(res,[],err.message)
+                            }
+                        }).catch((err) => {
+                            // failed(res, [], err)
+                        })
+                    }
                 })
             }).catch((err) => {
                 failed(res, [], err)
@@ -300,7 +314,7 @@ const users = {
                 success(res, result, 'Here are the users that data you requested')
             })
             .catch((err) => {
-                failed(res, [], err.message)
+                failed(res, [], err)
             })
         } catch (error) {
             failed(res, [], 'Internal server error!')
