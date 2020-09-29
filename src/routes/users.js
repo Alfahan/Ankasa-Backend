@@ -12,9 +12,9 @@ router
     // Insert
     .post('/insert', authenticate, authorize, usersController.insert)
     // Refresh Token
-    .post('/refreshToken', authenticate, usersController.renewToken)
+    .post('/refreshToken', usersController.renewToken)
     // Logout
-    .post('/logout/:iduser',authenticate, authorize, usersController.logout)
+    .post('/logout/:iduser', usersController.logout)
     // Forgot Password
     .post('/ForgotPassword', usersController.ForgotPassword)
     // Send New Password
