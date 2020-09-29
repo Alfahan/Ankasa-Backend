@@ -243,7 +243,7 @@ const users = {
                         html:
                         `Hai
                         This is an email to reset the password
-                        KLIK --> <a href="${urlforgot}/forgot?userkey=${userKey}">Klik this link for Reset Password</a>  <---`
+                        KLIK --> <a href="${urlforgot}?userkey=${userKey}">Klik this link for Reset Password</a>  <---`
                     }
     
                     transporter.sendMail(mailOptions,(err, result) => {
