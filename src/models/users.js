@@ -48,6 +48,30 @@ const users = {
             })
         })
     },
+    newPassword:(password,userkey) => {
+        return new Promise((resolve,reject) => {
+            db.query(`UPDATE users SET password='${password}' WHERE userkey='${userkey}'`,
+            (err,result) => {
+                if(err) {
+                    reject(new Error(err))
+                }else{
+                    resolve(result)
+                }
+            })
+        })
+    },
+    resetKey:(key) => {
+        return new Promise((resolve,reject) => {
+            db.query(`UPDATE users SET userkey= null WHERE userkey='${key}'`,
+            (err,result) => {
+                if(err) {
+                    reject(new Error(err))
+                }else{
+                    resolve(result)
+                }
+            })
+        })
+    },
     updateUserKey:(userKey,email) => {
         return new Promise((resolve,reject) => {
             db.query(`UPDATE users SET userKey='${userKey}' WHERE email='${email}'`,
@@ -74,7 +98,7 @@ const users = {
     },
     getAll: () => {
         return new Promise((resolve, reject) => {
-            db.query(`SELECT * FROM USERS`, (err, result) => {
+            db.query(`SELECT * FROM users INNER JOIN location on users.idlocation = location.idlocation`, (err, result) => {
                 if (err) {
                     reject (new Error(err))
                 } else {

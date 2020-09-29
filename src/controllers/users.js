@@ -1,6 +1,6 @@
 const usersModel = require('../models/users')
 const { success, failed, tokenStatus } = require('../helpers/response')
-const { JWT_KEY, passwordd, emaill, url, JWT_REFRESH } = require('../helpers/env')
+const { JWT_KEY, passwordd, emaill, url, urlforgot } = require('../helpers/env')
 const upload = require('../helpers/upload')
 const fs = require('fs')
 const bcrypt = require('bcrypt')
@@ -25,7 +25,8 @@ const users = {
                 password: hashWord,
                 level: 2,
                 active: 0,
-                refreshToken: null
+                refreshToken: null,
+                image: '404.png'
             }
 
             usersModel.register(data)
@@ -236,13 +237,13 @@ const users = {
                     })
     
                     let mailOptions = {
-                        from    : emaill,
+                        from    : `ANKASA ${emaill}`,
                         to      : body.email,
                         subject : `Reset Password ${body.email}`,
                         html:
                         `Hai
-                        
-                        KLIK --> <a href="${url}users/verify/${userKey}">Klik this link for Reset Password</a>  <---`
+                        This is an email to reset the password
+                        KLIK --> <a href="${urlforgot}/forgot?userkey=${userKey}">Klik this link for Reset Password</a>  <---`
                     }
     
                     transporter.sendMail(mailOptions,(err, result) => {
@@ -268,29 +269,27 @@ const users = {
     },
     newPassword: async (req, res) => {
         try {
-            const body = req.params.body
-
-            console.log(body.password)
-            // console.log(body.confirm)
-
+            const body = req.body
             
-            if( body.password === body.confirm ){
-                // const salt = await bcrypt.genSalt(10)
-                // // const hashWord = await bcrypt.hash(body.password, salt)
-                
-                // const userkey = body.userKey
-                // usersModel.newPassword(hashWord ,userkey)
-                // .then((result) => {
-                //     success(res, result, `Update Password Success`)
-                // }).catch((err) => {
-                //     failed(res, [], err)
-                // })
-            }else{
+            const salt = await bcrypt.genSalt(10)
+            const hashWord = await bcrypt.hash(body.password, salt)
 
-            }
+            const key = body.userkey
 
+            usersModel.newPassword(hashWord ,key)
+            .then((result) => {
+                success(res, result, `Update Password Success`)
+                usersModel.resetKey(key)
+                .then((results) => {
+                    success(res, results, `Update Password Success`)
+                }).catch((err) => {
+                    failed(res, [], err.message)
+                })
+            }).catch((err) => {
+                failed(res, [], err)
+            })        
         } catch (error) {
-            // failed(res, [], `Internal Server Error`)
+            failed(res, [], `Internal Server Error`)
         }
     },
     getAll: (req, res) => {
@@ -312,7 +311,7 @@ const users = {
             const iduser = req.params.iduser
             usersModel.getDetail(iduser)
             .then((result) => {
-                success(res, result, `Here is the data of users with id=${iduser}`)
+                success(res, result, `Here is the data of users with id ${iduser}`)
             })
             .catch((err) => {
                 failed(res, [], err.message)
@@ -346,11 +345,11 @@ const users = {
             failed(res, [], 'Internal server error!')
         }
     },
-    update: (req, res) => {
+    update:(req, res) => {
         try {
             upload.single('image')(req, res, (err) => {
                 if(err){
-                    if(err.code --- 'LIMIT_FILE_SIZE'){
+                    if(err.code === 'LIMIT_FILE_SIZE'){
                         failed(res, [], 'Image size is too big! Please upload another one with size <5mb')
                     } else {
                         failed(res, [], err)
@@ -360,26 +359,40 @@ const users = {
                     const body = req.body
                     usersModel.getDetail(iduser)
                     .then((result) => {
-                        body.image = req.file.filename
                         const oldImg = result[0].image
-                        let oldName = null
-                        if(!body.image) {
-                            oldName = oldImg
-                        } else {
-                            oldName = body.image
-                            fs.unlink(`src/uploads/${oldImg}`, (err) => {
-                                if(err){
-                                    failed(res, [], err.message)
-                                } else {
-                                    usersModel.update(body, iduser)
+                        body.image = !req.file ? oldImg: req.file.filename
+                        if (body.image !== oldImg) {
+                            if (oldImg !== '404.png') {
+                                fs.unlink(`src/uploads/${oldImg}`, (err) => {
+                                    if (err) {
+                                        failed(res, [], err.message)
+                                    } else {
+                                        usersModel.update(body, iduser)
+                                            .then((result) => {
+                                                success(res, result, 'Update success')
+                                            })
+                                            .catch((err) => {
+                                                failed(res, [], err.message)
+                                            })
+                                    }
+                                })
+                            } else {
+                                usersModel.update(body, iduser)
                                     .then((result) => {
-                                        success(res, result, `User with id  ${iduser} is updated!`)
+                                        success(res, result, 'Update success')
                                     })
                                     .catch((err) => {
                                         failed(res, [], err.message)
                                     })
-                                }
-                            })
+                            }
+                        } else {
+                            usersModel.update(body, iduser)
+                                .then((result) => {
+                                    success(res, result, 'Update success')
+                                })
+                                .catch((err) => {
+                                    failed(res, [], err.message)
+                                })
                         }
                     })
                 }
@@ -394,19 +407,29 @@ const users = {
             usersModel.getDetail(iduser)
             .then((result) => {
                 const image = result[0].image
-                fs.unlink(`src/uploads/${image}`, (err) => {
-                    if(err) {
+                if(image === '404.png'){
+                    usersModel.delete(iduser)
+                    .then((result) => {
+                        success(res, result, `User with id=${iduser} is deleted!`)
+                    })
+                    .catch((err) => {
                         failed(res, [], err.message)
-                    } else {
-                        usersModel.delete(iduser)
-                        .then((result) => {
-                            success(res, result, `User with id=${iduser} is deleted!`)
-                        })
-                        .catch((err) => {
+                    })
+                }else{
+                    fs.unlink(`src/uploads/${image}`, (err) => {
+                        if(err) {
                             failed(res, [], err.message)
-                        })
-                    }
-                })
+                        } else {
+                            usersModel.delete(iduser)
+                            .then((result) => {
+                                success(res, result, `User with id ${iduser} is deleted!`)
+                            })
+                            .catch((err) => {
+                                failed(res, [], err.message)
+                            })
+                        }
+                    })
+                }
             })
             .catch((err) => {
                 failed(res, [], err.message)
