@@ -1,11 +1,12 @@
 const db = require('../configs/db')
 
 const flight = {
-    getAll: (destination, from, classflight, flighttype, departure, sort, type,  direct, transit, transit2, luggage, meal, wifi, departuretimeFrom, departuretimeTo, timearrivedFrom, timearrivedTo, priceLow, priceHigh) => {
+    getAll: (airlines, destination, from, classflight, flighttype, departure, sort, type,  direct, transit, transit2, luggage, meal, wifi, departuretimeFrom, departuretimeTo, timearrivedFrom, timearrivedTo, priceLow, priceHigh) => {
         return new Promise ((resolve, reject) => {
             db.query(`SELECT * FROM flight INNER JOIN airlines ON flight.idairlines = airlines.idairlines 
             WHERE 
-            tocountry LIKE '%${destination}%' AND fromcountry LIKE '%${from}%' AND
+            flight.idairlines LIKE '%${airlines}' AND
+            tocity LIKE '%${destination}%' AND fromcity LIKE '%${from}%' AND
             class LIKE '%${classflight}%' AND
             flighttype LIKE '%${flighttype}%' AND
             departureday LIKE '%${departure}%' AND

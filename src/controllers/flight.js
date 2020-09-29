@@ -4,6 +4,7 @@ const { success, failed, successWithMeta } = require('../helpers/response')
 const flight = {
     getAll: (req, res) => {
         try {
+            const airlines = !req.query.airlines ? '' : req.query.airlines;
             const destination = !req.query.destination ? '' : req.query.destination;
             const from = !req.query.from ? '' : req.query.from;
             const classflight = !req.query.classflight ? '' : req.query.classflight;
@@ -23,7 +24,7 @@ const flight = {
             const timearrivedTo = !req.query.timearrivedTo ? '24:00:00' : req.query.timearrivedTo;
             const priceLow = !req.query.priceLow ? 0 : parseInt(req.query.priceLow);
             const priceHigh = !req.query.priceHigh ? 99999999999 : parseInt(req.query.priceHigh);
-            flightModel.getAll(destination, from, classflight, flighttype, departure, sort, type, direct, transit, transit2, luggage, meal, wifi, departuretimeFrom, departuretimeTo, timearrivedFrom, timearrivedTo, priceLow, priceHigh)
+            flightModel.getAll(airlines, destination, from, classflight, flighttype, departure, sort, type, direct, transit, transit2, luggage, meal, wifi, departuretimeFrom, departuretimeTo, timearrivedFrom, timearrivedTo, priceLow, priceHigh)
             .then((result) => {
                 
                 // console.log(meal, wifi, luggage, direct, transit, transit2)
