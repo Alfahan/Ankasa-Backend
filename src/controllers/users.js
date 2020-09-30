@@ -139,6 +139,7 @@ const users = {
                                         usersModel.updateRefreshToken(refreshToken,id)
                                         .then(() => {
                                             const data = {
+                                                iduser: userData.iduser,
                                                 username: userData.username,
                                                 token: token,
                                                 refreshToken: refreshToken
@@ -149,6 +150,7 @@ const users = {
                                         })
                                     }else{
                                         const data = {
+                                            iduser: userData.iduser,
                                             username: userData.username,
                                             token: token,
                                             refreshToken: userRefreshToken

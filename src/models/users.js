@@ -1,4 +1,3 @@
-const { reject, result } = require('lodash');
 const db = require('../configs/db');
 
 const users = {
