@@ -97,7 +97,7 @@ const users = {
     },
     getAll: () => {
         return new Promise((resolve, reject) => {
-            db.query(`SELECT * FROM users INNER JOIN location on users.idlocation = location.idlocation`, (err, result) => {
+            db.query(`SELECT * FROM users INNER JOIN location ON users.idlocation = location.idlocation`, (err, result) => {
                 if (err) {
                     reject (new Error(err))
                 } else {
@@ -108,7 +108,7 @@ const users = {
     },
     getDetail: (iduser) => {
         return new Promise((resolve, reject) => {
-            db.query(`SELECT * FROM users WHERE iduser ='${iduser}'`, (err, result) => {
+            db.query(`SELECT * FROM users INNER JOIN location ON users.idlocation = location.idlocation WHERE iduser ='${iduser}'`, (err, result) => {
                 if (err) {
                     reject(new Error(err))
                 } else {
