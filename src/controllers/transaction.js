@@ -1,6 +1,6 @@
 const transactionModel = require('../models/transaction')
 const { success, failed } = require('../helpers/response')
-const QRCode = require('qrcode')
+// const QRCode = require('qrcode')
 
 const transaction = {
     getall: (req,res) => {
@@ -12,44 +12,25 @@ const transaction = {
                 failed(res, [], err)
             })
         } catch (error) {
-            // failed(res, [], `Internal Server Error`)
+            failed(res, [], `Internal Server Error`)
         }
     },
     booking: (req,res) => {
         try {
             
             const body = req.body
-            const dataobj = {
+            const data = {
                 iduser : body.iduser,
                 idflight: body.idflight,
-                nationaly : body.nationaly,
+                nationality : body.nationality,
                 insurance : body.insurance,
                 child : body.child,
                 adult : body.adult,
                 payment: body.payment,
-                status : body.status
+                status : 0
             }
 
-            const data = JSON.stringify(dataobj)
-            
-            const qr = QRCode.toString(data, function (err, url) {
-                console.log(url)
-              })
-            const trans = {
-                qr : qr,
-                iduser : body.iduser,
-                idflight: body.idflight,
-                nationaly : body.nationaly,
-                insurance : body.insurance,
-                child : body.child,
-                adult : body.adult,
-                payment: body.payment,
-                status : body.status
-            }
-            console.log(qr)
-            console.log(data)
-            console.log(trans)
-            transactionModel.booking(trans)
+            transactionModel.booking(data)
             .then((result) => {
                 success(res, result, `Data Booking Success`)
                 
@@ -63,6 +44,7 @@ const transaction = {
     bookingdetail: (req,res) => {
         try {
             const id = req.params.idtransaction
+
             transactionModel.bookingdetail(id)
             .then((result) => {
                 success(res, result, `Data Detail Booking`)
@@ -77,7 +59,7 @@ const transaction = {
     bookinguser: (req, res) => {
         try {
             const id = req.params.iduser
-            // console.log(id)
+            
             transactionModel.bookinguser(id)
             .then((result) => {
                 success(res, result, `Data Booking User`)
@@ -85,7 +67,7 @@ const transaction = {
                 (res, [], err.message)
             })
         } catch (error) {
-            // failed(res,[], `Internal Server Error`)
+            failed(res,[], `Internal Server Error`)
         }
     }
 }
