@@ -26,7 +26,8 @@ const users = {
                 level: 2,
                 active: 0,
                 refreshToken: null,
-                image: '404.png'
+                image: '404.png',
+                idlocation: 1
             }
 
             usersModel.register(data)
