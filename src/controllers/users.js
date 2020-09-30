@@ -68,7 +68,7 @@ const users = {
                 })
 
                 res.json({
-                    message: `Success Registration, Please Activation of Email`
+                    message: `Success Registration, Please activate your email`
                 })
             })
             .catch((err) => {

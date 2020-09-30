@@ -1,5 +1,6 @@
 const transactionModel = require('../models/transaction')
 const { success, failed } = require('../helpers/response')
+const QRCode = require('qrcode')
 
 const transaction = {
     getall: (req,res) => {
@@ -16,11 +17,42 @@ const transaction = {
     },
     booking: (req,res) => {
         try {
+            
             const body = req.body
-            console.log(body)
-            transactionModel.booking(body)
+            const dataobj = {
+                iduser : body.iduser,
+                idflight: body.idflight,
+                nationaly : body.nationaly,
+                insurance : body.insurance,
+                child : body.child,
+                adult : body.adult,
+                payment: body.payment,
+                status : body.status
+            }
+
+            const data = JSON.stringify(dataobj)
+            
+            const qr = QRCode.toString(data, function (err, url) {
+                console.log(url)
+              })
+            const trans = {
+                qr : qr,
+                iduser : body.iduser,
+                idflight: body.idflight,
+                nationaly : body.nationaly,
+                insurance : body.insurance,
+                child : body.child,
+                adult : body.adult,
+                payment: body.payment,
+                status : body.status
+            }
+            console.log(qr)
+            console.log(data)
+            console.log(trans)
+            transactionModel.booking(trans)
             .then((result) => {
                 success(res, result, `Data Booking Success`)
+                
             }).catch((err) => {
                 failed(res, [], err.message)
             })
@@ -34,6 +66,7 @@ const transaction = {
             transactionModel.bookingdetail(id)
             .then((result) => {
                 success(res, result, `Data Detail Booking`)
+
             }).catch((err) => {
                 (res, [], err.message)
             })
