@@ -142,6 +142,7 @@ const users = {
                                             const data = {
                                                 iduser: userData.iduser,
                                                 username: userData.username,
+                                                level: userData.level,
                                                 token: token,
                                                 refreshToken: refreshToken
                                             }
@@ -153,6 +154,7 @@ const users = {
                                         const data = {
                                             iduser: userData.iduser,
                                             username: userData.username,
+                                            level: userData.level,
                                             token: token,
                                             refreshToken: userRefreshToken
                                         }
