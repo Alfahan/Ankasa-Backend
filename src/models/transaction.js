@@ -39,7 +39,7 @@ const transaction = {
     },
     bookinguser: (id) =>{
         return new Promise((resolve, reject) => {
-            db.query(`SELECT *FROM transaction INNER JOIN flight ON transaction.idflight = flight.idflight WHERE iduser = '${id}'`,
+            db.query(`SELECT *FROM transaction INNER JOIN flight ON transaction.idflight = flight.idflight INNER JOIN airlines ON flight.idairlines = airlines.idairlines WHERE iduser = '${id}'`,
             (err,result) => {
                 if(err) {
                     reject(new Error(err))
