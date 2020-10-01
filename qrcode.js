@@ -7,7 +7,7 @@ const dataobj = {
 
 const data = JSON.stringify(dataobj)
 
-QRCode.toString(data,{type:'terminal'}, function (err, url) {
+QRCode.toString('Hello world',{type:'terminal'}, function (err, url) {
     console.log(url)
   })
 
